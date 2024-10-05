@@ -1,0 +1,51 @@
+<!-- templates/profile.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ user.username }}'s Profile</title>
+</head>
+<body>
+    <h2>{{ user.username }}'s Profile</h2>
+    <p>Bio: {{ user.profile.bio }}</p> <!-- Assuming you have a bio in the Profile model -->
+    
+    {% if user.profile.profile_picture %}
+        <img src="{{ user.profile.profile_picture.url }}" alt="Profile Picture">
+    {% endif %}
+    
+    <h1>Your Followers</h1>
+    
+    {% if followers %}
+        <ul>
+            {% for follow in followers %}
+                <li>
+                    <a href="{% url 'profile' follow.follower.username %}">{{ follow.follower.username }}</a>
+                </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>You have no followers yet.</p>
+    {% endif %}
+    
+    <a href="{% url 'profile_edit' user.username %}">Edit Profile</a>
+    
+    {% if request.user != user %}  <!-- Check if the logged-in user is not the profile user -->
+        {% with is_following=request.user.follows.filter(following=user).exists %} <!-- Check if the logged-in user is following the profile user -->
+            {% if is_following %}
+                <!-- Unfollow button -->
+                <form action="{% url 'unfollow' user.username %}" method="post">
+                    {% csrf_token %}
+                    <button type="submit">Unfollow</button>
+                </form>
+            {% else %}
+                <!-- Follow button -->
+                <form action="{% url 'follow' user.username %}" method="post">
+                    {% csrf_token %}
+                    <button type="submit">Follow</button>
+                </form>
+            {% endif %}
+        {% endwith %}
+    {% endif %}
+</body>
+</html>

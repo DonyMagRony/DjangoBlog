@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Edit {{ post.title }}</title>
+</head>
+<body>
+    <h1>Edit Post</h1>
+    h2><a href="{% url 'post_detail' post.pk %}">{{ post.title }}</a></h2>
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Update Post</button>
+    </form>
+</body>
+</html>
