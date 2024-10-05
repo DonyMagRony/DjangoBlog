@@ -1,7 +1,14 @@
+{% extends 'base.html' %}
 
-<h1>Edit Profile for {{ user.username }}</h1>
-<form method="POST" enctype="multipart/form-data">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit">Save changes</button>
-</form>
+{% block title %}
+    Edit Profile for {{ user.username }}
+{% endblock %}
+
+{% block content %}
+    <h3>Edit Profile for {{ user.username }}</h1>
+    <form method="POST" enctype="multipart/form-data">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Save changes</button>
+    </form>
+{% endblock %}

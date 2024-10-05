@@ -17,7 +17,9 @@ class Profile(models.Model):
         'Profile Picture',
         upload_to='profile_pictures/',
         blank=True,
-        null=True
+        null=False,
+        default='profile_pictures/default.jpg'  # Update the path as needed
+
     )
 
     def __str__(self):

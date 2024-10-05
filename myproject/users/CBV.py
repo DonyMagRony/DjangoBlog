@@ -10,45 +10,70 @@ from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.exceptions import PermissionDenied
 
+class BaseProfileView(View):
+    def get_profile_user(self, username):
+        return get_object_or_404(User, username=username)
+
+    def get_profile(self, user):
+        return get_object_or_404(Profile, user=user)
+    
 
 class ProfileView(LoginRequiredMixin, View):
+    def get(self, request, username=None):
+        if username:
+            # Retrieve specific user profile
+            profile_user = self.get_profile_user(username)
+            profile = self.get_profile(profile_user)
+            
+            followers = Follow.objects.filter(following=profile_user).select_related('follower')
+            is_following = Follow.objects.filter(follower=request.user, following=profile_user).exists()
+
+            return render(request, 'profile.html', {
+                'user': profile_user,
+                'profile': profile,
+                'followers': followers,
+                'is_following': is_following,
+            })
+        else:
+            # Retrieve all profiles excluding the current user
+            all_profiles = Profile.objects.exclude(user=request.user)  # Assuming 'user' is the field in Profile model
+
+            return render(request, 'profiles.html', {
+                'profiles': all_profiles,
+            })
+
+    def get_profile_user(self, username):
+        # Assuming you have a method to get the user from the username
+        from django.contrib.auth.models import User
+        return User.objects.get(username=username)
+
+    def get_profile(self, user):
+        # Assuming you have a method to get the profile from the user
+        return Profile.objects.get(user=user)
+
+
+class ProfileEditView(LoginRequiredMixin, BaseProfileView):
     def get(self, request, username):
-        # Fetch the user based on the username provided in the URL
-        profile_user = get_object_or_404(User, username=username)  # Get the user by username
-        profile = get_object_or_404(Profile, user=profile_user)  # Get the profile associated with that user
-        
-        # Get the list of followers for the profile user
-        followers = Follow.objects.filter(following=profile_user).select_related('follower')
-
-        return render(request, 'profile.html', {
-            'user': profile_user,
-            'profile': profile,
-            'followers': followers,  # Pass the followers list to the template
-        })
-
-
-class ProfileEditView(LoginRequiredMixin, View):
-    def get(self, request, username):
-        # Check if the requested profile belongs to the logged-in user
         if request.user.username != username:
-            raise PermissionDenied  # or you can redirect to a different page
-
-        profile = get_object_or_404(Profile, user=request.user)  # Fetch the user's profile
-        form = ProfileForm(instance=profile)  # Create a form instance for the profile
-        return render(request, 'profile_edit.html', {'form': form})  # Render the edit form
+            raise PermissionDenied
+        
+        profile_user = self.get_profile_user(username)
+        profile = self.get_profile(profile_user)
+        form = ProfileForm(instance=profile)
+        
+        return render(request, 'profile_edit.html', {'form': form})
 
     def post(self, request, username):
-        # Check if the requested profile belongs to the logged-in user
         if request.user.username != username:
-            raise PermissionDenied  # or you can redirect to a different page
+            raise PermissionDenied
         
-        profile = get_object_or_404(Profile, user=request.user)  # Fetch the user's profile
-        form = ProfileForm(request.POST, request.FILES, instance=profile)  # Handle form submission with instance
+        profile_user = self.get_profile_user(username)
+        profile = self.get_profile(profile_user)
+        form = ProfileForm(request.POST, request.FILES, instance=profile)
         
-        if form.is_valid():  # Check if the form is valid
-            form.save()  # Save the updated profile
-            messages.success(request, "Profile updated successfully!")  # Success message
-            return redirect('profile', username=request.user.username)  # Redirect to the profile page using the username
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Profile updated successfully!")
+            return redirect('profile', username=request.user.username)
         
-        # If the form is invalid, render the form again with errors
         return render(request, 'profile_edit.html', {'form': form})

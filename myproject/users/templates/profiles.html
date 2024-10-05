@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+
+{% block title %}User Profiles{% endblock %}
+
+{% block content %}
+    <style>
+        .profile-picture {
+            width: 100px;  /* Set the width you want */
+            height: 100px; /* Set the height you want */
+            object-fit: cover; /* This will ensure the image covers the box without stretching */
+            border-radius: 50%; /* Optional: make it circular */
+        }
+    </style>
+
+    <h2>User Profiles</h2>
+    <ul>
+        {% for profile in profiles %}
+            <li>
+               <h3><a href="{% url 'profile' profile.user.username %}">{{ profile.user.username }}</a></h3>
+            </li>
+                
+            {% if profile.profile_picture %}
+                <img class="profile-picture" src="{{ profile.profile_picture.url }}" alt="Profile Picture">
+            {% endif %}
+        {% empty %}
+            <p>No profiles available.</p>
+        {% endfor %}
+    </ul>
+{% endblock %}

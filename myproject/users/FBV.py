@@ -3,7 +3,7 @@ from django.contrib.auth.models import User
 from django.views import View
 from .models import Profile,Follow
 from .forms import UserRegisterForm,ProfileForm
-from django.contrib.auth import authenticate, login
+from django.contrib.auth import authenticate, login,logout
 from django.contrib.auth.forms import AuthenticationForm  # Optional: for using built-in form
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
@@ -44,6 +44,10 @@ def login_view(request):
 
     return render(request, 'login.html', {'form': form}) 
 
+@login_required
+def logout_view(request):
+    logout(request)
+    return redirect('login')
 
 @login_required
 def follow(request, username):
