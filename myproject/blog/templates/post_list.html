@@ -12,6 +12,13 @@
         <button type="submit">Submit</button>
     </form>
     
+    <h2>Search Posts</h2>
+    <form method="get" action="{% url 'posts' %}">
+        <input type="text" name="title" placeholder="Search by title" value="{{ title_query }}">
+        <input type="text" name="author" placeholder="Search by author" value="{{ author_query }}">
+        <button type="submit">Search</button>
+    </form>
+
     <h1>All Posts</h1>
     {% for post in posts %}
         <div>
@@ -21,4 +28,22 @@
     {% empty %}
         <p>No posts available.</p>
     {% endfor %}
+
+    <div class="pagination">
+        <span class="step-links">
+          {% if page_obj.has_previous %}
+            <a href="?page=1">&laquo; first</a>
+            <a href="?page={{ page_obj.previous_page_number }}">previous</a>
+          {% endif %}
+    
+          <span class="current">
+            Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}.
+          </span>
+    
+          {% if page_obj.has_next %}
+            <a href="?page={{ page_obj.next_page_number }}">next</a>
+            <a href="?page={{ page_obj.paginator.num_pages }}">last &raquo;</a>
+          {% endif %}
+        </span>
+      </div>
 {% endblock %}

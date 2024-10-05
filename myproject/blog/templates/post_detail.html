@@ -10,7 +10,7 @@
     <!-- Post details -->
     <h3>{{ post.title }}</h3>
     <p>{{ post.content }}</p>
-    
+    <p>{{post.created_at}}</p>
     <!-- Link to author's profile -->
     <p>
         <a href="{% url 'profile' post.author.username %}">
