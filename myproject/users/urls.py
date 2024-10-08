@@ -9,12 +9,12 @@ urlpatterns = [
     path('register/', register, name='register'),
     path('login/', login_view, name='login'),  
     path('logout/', logout_view, name='logout'),
-    path('profile/', ProfileView.as_view(), name='profile'),  # Author profile 
-    path('profile/<str:username>/', ProfileView.as_view(), name='profile'),  # Author profile
-    path('my_profile/<str:username>/', ProfileView.as_view(), name='self_profile'),  # Self-profile
-    path('my_profile/<str:username>/edit/', ProfileEditView.as_view(), name='profile_edit'),  # Edit profile
-    path('follow/<str:username>/', follow, name='follow'),  # Follow profile
-    path('unfollow/<str:username>/', unfollow, name='unfollow'),  # Unfollow profile
+    path('profile/', ProfileView.as_view(), name='profile'),  
+    path('profile/<str:username>/', ProfileView.as_view(), name='profile'),  
+    path('my_profile/<str:username>/', ProfileView.as_view(), name='self_profile'),  
+    path('my_profile/<str:username>/edit/', ProfileEditView.as_view(), name='profile_edit'),  
+    path('follow/<str:username>/', follow, name='follow'),  
+    path('unfollow/<str:username>/', unfollow, name='unfollow'),  
 ]
 
 if settings.DEBUG:

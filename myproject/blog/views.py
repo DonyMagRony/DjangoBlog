@@ -6,6 +6,8 @@ from .forms import CommentForm, NewPostForm
 from .serializers import PostSerializer
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.paginator import Paginator
+from functools import lru_cache
+
 
 class BasePostView(LoginRequiredMixin, View):
     model = Post  # Base model for post views
@@ -23,6 +25,7 @@ class PostsListCreateView(BasePostView):
     template_name = 'post_list.html'
     paginate_by = 1
     
+    @lru_cache(maxsize=15)
     def get_posts(self, request):
         title_query = request.GET.get('title', '')
         author_query = request.GET.get('author', '')
@@ -43,6 +46,7 @@ class PostsListCreateView(BasePostView):
         page_obj = paginator.get_page(page_number)
         return page_obj
 
+    @lru_cache(maxsize=10)
     def get(self, request):
         posts = self.get_posts(request)
         form = NewPostForm()
@@ -71,7 +75,7 @@ class PostsListCreateView(BasePostView):
 
 class PostDetailView(BasePostView):
     template_name = 'post_detail.html'
-
+    
     def get(self, request, pk):
         post = self.get_post(pk)
         comments = post.comments.all()  
@@ -88,11 +92,10 @@ class PostDetailView(BasePostView):
         comment_form = CommentForm(request.POST)
         if comment_form.is_valid():
             comment = comment_form.save(commit=False)
-            comment.post = post  # Associate the comment with the post
-            comment.author = request.user  # Set the current user as the author
+            comment.post = post  
+            comment.author = request.user  
             comment.save()
-            return redirect('post_detail', pk=post.pk)  # Redirect back to the post detail
-        # If the comment form is invalid, re-render with errors
+            return redirect('post_detail', pk=post.pk)  
         comments = post.comments.all()
         context = {
             'post': post,
@@ -106,17 +109,17 @@ class PostUpdateView(BasePostView):
 
     def get(self, request, pk):
         post = self.get_post(pk)
-        form = NewPostForm(instance=post)  # Pre-fill the form with post data
+        form = NewPostForm(instance=post) 
         context = {'post': post, 'form': form}
         return render(request, self.template_name, context)
 
     def post(self, request, pk):
         post = self.get_post(pk)
-        form = NewPostForm(request.POST, instance=post)  # Bind form to the post instance
+        form = NewPostForm(request.POST, instance=post)  
         if form.is_valid():
-            updated_post = form.save(commit=False)  # Don't save to the database yet
-            updated_post.author = post.author  # Keep the original author
-            updated_post.save()  # Now save it
+            updated_post = form.save(commit=False)  
+            updated_post.author = post.author  
+            updated_post.save()  
             return redirect('post_detail', pk=post.pk)
         context = {'post': post, 'form': form}
         return render(request, self.template_name, context)

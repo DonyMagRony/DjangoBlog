@@ -1,12 +1,11 @@
 from django.db import models
 from django.contrib.auth.models import User
 
-# Profile model
 class Profile(models.Model):
     user = models.OneToOneField(
         User,
         on_delete=models.CASCADE,
-        related_name='profile'  # Access profile via user.profile
+        related_name='profile'  
     )
     bio = models.TextField(
         'Bio',
@@ -18,8 +17,7 @@ class Profile(models.Model):
         upload_to='profile_pictures/',
         blank=True,
         null=False,
-        default='profile_pictures/default.jpg'  # Update the path as needed
-
+        default='profile_pictures/default.jpg' 
     )
 
     def __str__(self):
@@ -29,17 +27,16 @@ class Follow(models.Model):
     follower = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
-        related_name='following',  # The users this user is following
+        related_name='following', 
     )
     following = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
-        related_name='followers',  # The users following this user
+        related_name='followers', 
     )
-    created_at = models.DateTimeField(auto_now_add=True)  # Timestamp for when the follow happened
-
+    created_at = models.DateTimeField(auto_now_add=True)  
     class Meta:
-        unique_together = ('follower', 'following')  # Ensures no duplicate follow relationships
+        unique_together = ('follower', 'following')  
 
     def __str__(self):
         return f"{self.follower.username} follows {self.following.username}"

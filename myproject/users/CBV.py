@@ -9,7 +9,7 @@ from django.contrib.auth.forms import AuthenticationForm  # Optional: for using 
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.exceptions import PermissionDenied
-
+from functools import lru_cache
 class BaseProfileView(View):
     def get_profile_user(self, username):
         return get_object_or_404(User, username=username)
@@ -19,9 +19,9 @@ class BaseProfileView(View):
     
 
 class ProfileView(LoginRequiredMixin, View):
+    @lru_cache(maxsize=15)
     def get(self, request, username=None):
         if username:
-            # Retrieve specific user profile
             profile_user = self.get_profile_user(username)
             profile = self.get_profile(profile_user)
             
@@ -32,23 +32,20 @@ class ProfileView(LoginRequiredMixin, View):
                 'user': profile_user,
                 'profile': profile,
                 'followers': followers,
+                'following':following,
                 'is_following': is_following,
             })
         else:
-            # Retrieve all profiles excluding the current user
-            all_profiles = Profile.objects.exclude(user=request.user)  # Assuming 'user' is the field in Profile model
-
+            all_profiles = Profile.objects.exclude(user=request.user)  
             return render(request, 'profiles.html', {
                 'profiles': all_profiles,
             })
 
     def get_profile_user(self, username):
-        # Assuming you have a method to get the user from the username
         from django.contrib.auth.models import User
         return User.objects.get(username=username)
 
     def get_profile(self, user):
-        # Assuming you have a method to get the profile from the user
         return Profile.objects.get(user=user)
 
 

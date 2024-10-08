@@ -7,11 +7,9 @@
 {% block content %}
     <h2><a href="{% url 'posts' %}">Posts</a></h2>
     
-    <!-- Post details -->
     <h3>{{ post.title }}</h3>
     <p>{{ post.content }}</p>
     <p>{{post.created_at}}</p>
-    <!-- Link to author's profile -->
     <p>
         <a href="{% url 'profile' post.author.username %}">
             {{ post.author.username }}
@@ -21,22 +19,18 @@
     {% if request.user == post.author %}
         <a href="{% url 'post_form' post.pk %}">Edit Post</a>
     {%endif%}
-    <!-- Edit post link -->
     <h3>Add a Comment</h3>
     
     
-    <!-- Comment form -->
     <form method="post">
         {% csrf_token %}
         {{ comment_form.as_p }}
         <button type="submit">Add Comment</button>
     </form>
 
-    <!-- Comments section -->
     <h2>Comments</h2>
     {% for comment in comments %}
         <div>
-            <!-- Link to comment author's profile -->
             <p>
                 <strong>
                     <a href="{% url 'profile' comment.author.username %}">

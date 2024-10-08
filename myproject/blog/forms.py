@@ -3,10 +3,10 @@ from .models import Post,Comment
 
 class NewPostForm(forms.ModelForm):
     class Meta:
-        model = Post  # Link this form to the Post model
-        fields = ['title', 'content']  # Specify the fields you want in the form
+        model = Post  
+        fields = ['title', 'content']  
         widgets = {
-            'content': forms.Textarea(attrs={'cols': 30, 'rows': 4})  # Smaller size
+            'content': forms.Textarea(attrs={'cols': 30, 'rows': 4})  
         }
         
 class CommentForm(forms.ModelForm):

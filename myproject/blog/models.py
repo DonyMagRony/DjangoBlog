@@ -1,14 +1,13 @@
 from django.db import models
 from django.contrib.auth.models import User
 
-# Post model
 class Post(models.Model):
     class Meta:
         db_table = "post"
 
     title = models.CharField(
         'Title',
-        max_length=255,  # Set a max_length for CharField
+        max_length=255,  
         unique=False,
         blank=False,
         null=False
@@ -21,18 +20,17 @@ class Post(models.Model):
     )
     created_at = models.DateTimeField(
         'Created at',
-        auto_now_add=True  # Automatically set the field to now when the object is first created
+        auto_now_add=True
     )
     author = models.ForeignKey(
-        User,  # Reference to Django's built-in User model
-        on_delete=models.CASCADE,  # If the user is deleted, their posts are deleted as well
-        related_name='posts'  # Related name to easily access the posts from the User model
+        User,  
+        on_delete=models.CASCADE,  
+        related_name='posts'  
     )
 
     def __str__(self):
         return self.title
 
-# Comment model
 class Comment(models.Model):
     class Meta:
         db_table = "comment"
@@ -44,17 +42,17 @@ class Comment(models.Model):
     )
     created_at = models.DateTimeField(
         'Created at',
-        auto_now_add=True  # Automatically set the field to now when the comment is created
+        auto_now_add=True  
     )
     post = models.ForeignKey(
         Post,
-        on_delete=models.CASCADE,  # If the related post is deleted, the comments are deleted too
-        related_name='comments'  # Related name to easily access comments from the Post model
+        on_delete=models.CASCADE,  
+        related_name='comments' 
     )
     author = models.ForeignKey(
-        User,  # Reference to Django's built-in User model
-        on_delete=models.CASCADE,  # If the user is deleted, their comments are deleted too
-        related_name='comments'  # Related name to access user comments
+        User, 
+        on_delete=models.CASCADE, 
+        related_name='comments'  
     )
 
     def __str__(self):

@@ -4,7 +4,7 @@ from django.views import View
 from .models import Profile,Follow
 from .forms import UserRegisterForm,ProfileForm
 from django.contrib.auth import authenticate, login,logout
-from django.contrib.auth.forms import AuthenticationForm  # Optional: for using built-in form
+from django.contrib.auth.forms import AuthenticationForm  
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 
@@ -13,11 +13,10 @@ def register(request, *args, **kwargs):
         user_form = UserRegisterForm(request.POST)
 
         if user_form.is_valid() :
-            user = user_form.save()  # Save the user to the database
-            login(request, user)  # Log in the newly registered user
+            user = user_form.save()  
+            login(request, user)  
             Profile.objects.create(user=user)  
-            return redirect('profile')  # Redirect to the profile page or another page
-
+            return redirect('profile') 
     else:
         user_form = UserRegisterForm()
     return render(request, 'register.html', {
@@ -26,21 +25,21 @@ def register(request, *args, **kwargs):
 
 def login_view(request):
     if request.method == 'POST':
-        form = AuthenticationForm(request, data=request.POST)  # Create a form instance with the submitted data
+        form = AuthenticationForm(request, data=request.POST) 
         if form.is_valid():
-            username = form.cleaned_data['username']  # Get the username
-            password = form.cleaned_data['password']  # Get the password
-            user = authenticate(username=username, password=password)  # Authenticate the user
+            username = form.cleaned_data['username']  
+            password = form.cleaned_data['password']  
+            user = authenticate(username=username, password=password)  
             
             if user is not None:
-                login(request, user)  # Log the user in
-                return redirect(f'/users/my_profile/{user.username}/')  # Redirect to their profile
+                login(request, user)  
+                return redirect(f'/users/my_profile/{user.username}/')  
             else:
-                messages.error(request, "Invalid username or password.")  # Handle authentication failure
+                messages.error(request, "Invalid username or password.") 
         else:
             messages.error(request, "Invalid login credentials.")
     else:
-        form = AuthenticationForm()  # Create an empty form for GET requests
+        form = AuthenticationForm()  
 
     return render(request, 'login.html', {'form': form}) 
 
@@ -53,25 +52,20 @@ def logout_view(request):
 def follow(request, username):
     user_to_follow = get_object_or_404(User, username=username)
 
-    # Prevent a user from following themselves
     if request.user == user_to_follow:
         return redirect('profile', username=username)
 
-    # Create a follow relationship
     Follow.objects.get_or_create(follower=request.user, following=user_to_follow)
     
-    return redirect('profile', username=username)  # Redirect back to the profile
+    return redirect('profile', username=username)  
 
 @login_required
 def unfollow(request, username):
     user_to_unfollow = get_object_or_404(User, username=username)
 
-    # Prevent a user from unfollowing themselves
     if request.user == user_to_unfollow:
         return redirect('profile', username=username)
 
-    # Remove the follow relationship
     Follow.objects.filter(follower=request.user, following=user_to_unfollow).delete()
     
-    return redirect('profile', username=username)  # Redirect back to the profile
-
+    return redirect('profile', username=username)

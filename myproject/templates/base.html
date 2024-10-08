@@ -15,7 +15,7 @@
                 {% if user.is_authenticated %}
                     <li><a href="{% url 'posts' %}">Posts</a></li>
                     <li><a href="{% url 'profile'%}">Profiles</a></li>
-                    <li><a href="{% url 'self_profile' user.username %}">My Profile</a></li>
+                    <li><a href="{% url 'self_profile' request.user.username %}">My Profile</a></li>
                     <li><a href="{% url 'logout' %}">Logout</a></li>
                 {% else %}
                     <li><a href="{% url 'register' %}">Register</a></li>
